@@ -1,0 +1,256 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db2-secret-generator-deploy
+spec:
+  template:
+    metadata:
+      name: db2-secret-generator-deploy
+    spec:
+      containers:
+      - name: db2-secret-generator-deploy
+        image: ibmcom/kubernetes:v1.5.2
+        command: ["/bin/sh","-c"]
+        args: ["/kubectl get secret db2-secret || /kubectl create secret generic db2-secret --from-literal=dbUser=db2inst1 --from-literal=dbPass=`< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;`"]
+        resources:
+          limits:
+            cpu: 100m
+      restartPolicy: Never
+---
+apiVersion: v1
+data:
+  entry.sh: |
+    #!/bin/bash
+    set -e
+    #
+    #   Initialize DB2 instance in a Docker container
+    #
+    # # Authors:
+    #   * Leo (Zhong Yu) Wu       <leow@ca.ibm.com>
+    #   * Daniel Cleyrat          <dacleyra@us.ibm.com>
+    #
+    # Copyright 2015, IBM Corporation
+    #
+    # Licensed under the Apache License, Version 2.0 (the "License");
+    # you may not use this file except in compliance with the License.
+    # You may obtain a copy of the License at
+    #
+    #      http://www.apache.org/licenses/LICENSE-2.0
+    #
+    # Unless required by applicable law or agreed to in writing, software
+    # distributed under the License is distributed on an "AS IS" BASIS,
+    # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    # See the License for the specific language governing permissions and
+    # limitations under the License.
+
+    if [ -z "$DB2INST1_PASSWORD" ]; then
+      echo ""
+      echo >&2 'error: DB2INST1_PASSWORD not set'
+      echo >&2 'Did you forget to add -e DB2INST1_PASSWORD=... ?'
+      exit 1
+    else
+      echo -e "$DB2INST1_PASSWORD\n$DB2INST1_PASSWORD" | passwd db2inst1
+    fi
+
+    if [ -z "$LICENSE" ];then
+       echo ""
+       echo >&2 'error: LICENSE not set'
+       echo >&2 "Did you forget to add '-e LICENSE=accept' ?"
+       exit 1
+    fi
+
+    if [ "${LICENSE}" != "accept" ];then
+       echo ""
+       echo >&2 "error: LICENSE not set to 'accept'"
+       echo >&2 "Please set '-e LICENSE=accept' to accept License before use the DB2 software contained in this image."
+       exit 1
+    fi
+
+    if [[ $1 = "db2start" ]]; then
+      su - db2inst1 -c "db2start"
+      if [[ ! -z "$DBNAME" ]]; then
+        chown -R db2inst1:db2inst1 /home/db2inst1/db2inst1
+        su - db2inst1 -c "db2 create database $DBNAME"
+      fi
+      nohup /usr/sbin/sshd -D 2>&1 > /dev/null &
+      while true; do sleep 1000; done
+    else
+      exec "$1"
+    fi
+kind: ConfigMap
+metadata:
+  name: db2-entry
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db2-tradedb
+  labels:
+    app: db2-tradedb
+spec:
+  ports:
+  - port: 50000
+    name: db2-tradedb
+  clusterIP: None
+  selector:
+    app: db2-tradedb
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: db2-tradedb
+spec:
+  serviceName: "db2-tradedb"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: db2-tradedb
+    spec:
+      containers:
+      - name: db2-tradedb
+        image: ibmcom/db2express-c
+        command: ["/bin/bash"]
+        args: ["-c", "/opt/db2-entry/entry.sh db2start"]
+        env:
+        - name: LICENSE
+          value: accept
+        - name: DBNAME
+          value: trade
+        - name: DB2INST1_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db2-secret
+              key: dbPass
+        ports:
+        - containerPort: 50000
+          name: db2-tradedb
+        volumeMounts:
+        - name: entry
+          mountPath: /opt/db2-entry
+        - name: db2-tradedb
+          mountPath: /home/db2inst1/db2inst1
+      volumes:
+      - name: entry
+        configMap:
+          name: db2-entry
+          defaultMode: 0744
+      - name: db2-tradedb
+        hostPath:
+          path: "/var/lib/db2-tradedb/home/db2inst1/db2inst1"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db2-sessiondb
+  labels:
+    app: db2-sessiondb
+spec:
+  ports:
+  - port: 50000
+    name: db2-sessiondb
+  clusterIP: None
+  selector:
+    app: db2-sessiondb
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: db2-sessiondb
+spec:
+  serviceName: "db2-sessiondb"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: db2-sessiondb
+    spec:
+      containers:
+      - name: db2-sessiondb
+        image: ibmcom/db2express-c
+        command: ["/bin/bash"]
+        args: ["-c", "/opt/db2-entry/entry.sh db2start"]
+        env:
+        - name: LICENSE
+          value: accept
+        - name: DBNAME
+          value: session
+        - name: DB2INST1_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db2-secret
+              key: dbPass
+        ports:
+        - containerPort: 50000
+          name: db2-sessiondb
+        volumeMounts:
+        - name: entry
+          mountPath: /opt/db2-entry
+        - name: db2-sessiondb
+          mountPath: /home/db2inst1/db2inst1
+      volumes:
+      - name: entry
+        configMap:
+          name: db2-entry
+          defaultMode: 0744
+      - name: db2-sessiondb
+        hostPath:
+          path: "/var/lib/db2-sessiondb/home/db2inst1/db2inst1"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db2-tranlogdb
+  labels:
+    app: db2-tranlogdb
+spec:
+  ports:
+  - port: 50000
+    name: db2-tranlogdb
+  clusterIP: None
+  selector:
+    app: db2-tranlogdb
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: db2-tranlogdb
+spec:
+  serviceName: "db2-tranlogdb"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: db2-tranlogdb
+    spec:
+      containers:
+      - name: db2-tranlogdb
+        image: ibmcom/db2express-c
+        command: ["/bin/bash"]
+        args: ["-c", "/opt/db2-entry/entry.sh db2start"]
+        env:
+        - name: LICENSE
+          value: accept
+        - name: DBNAME
+          value: tranlog
+        - name: DB2INST1_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db2-secret
+              key: dbPass
+        ports:
+        - containerPort: 50000
+          name: db2-tranlogdb
+        volumeMounts:
+        - name: entry
+          mountPath: /opt/db2-entry
+        - name: db2-tranlogdb
+          mountPath: /home/db2inst1/db2inst1
+      volumes:
+      - name: entry
+        configMap:
+          name: db2-entry
+          defaultMode: 0744
+      - name: db2-tranlogdb
+        hostPath:
+          path: "/var/lib/db2-tranlogdb/home/db2inst1/db2inst1"
