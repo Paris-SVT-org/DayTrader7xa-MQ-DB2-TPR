@@ -24,7 +24,7 @@
 
   <iiopEndpoint id="defaultIiopEndpoint" iiopPort="2809" iiopsPort="2810"/>
 
-  <application id="daytrader7" location="daytrader-ee7.ear" name="daytrader7"/>
+  <application id="daytrader7" location="daytrader-ee7-1.0-SNAPSHOT.ear" name="daytrader7"/>
 
 
   <jdbcDriver id="DB2JCC" libraryRef="DB2JCCLib"/>
