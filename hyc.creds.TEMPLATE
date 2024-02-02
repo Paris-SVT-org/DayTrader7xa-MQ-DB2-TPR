@@ -1,0 +1,4 @@
+hyc_user=yourid@us.ibm.com
+hyc_token=yourtoken
+REG_USER=$hyc_user
+REG_PASSWORD=$hyc_token

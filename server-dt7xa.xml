@@ -1,0 +1,128 @@
+<server>
+    <featureManager>
+        <feature>ejb-3.2</feature>
+        <feature>servlet-4.0</feature>
+        <feature>jsf-2.3</feature>
+        <feature>jpa-2.2</feature>
+        <feature>jmsMdb-3.2</feature>
+        <!--<feature>wasJmsServer-1.0</feature>-->
+        <!--<feature>wasJmsClient-2.0</feature>-->
+        <feature>cdi-2.0</feature>
+        <feature>websocket-1.1</feature>
+        <feature>concurrent-1.0</feature>
+        <feature>jsonp-1.1</feature>
+        <feature>beanValidation-2.0</feature>
+        <!--user-defined xaflow-1.0 feature to test transaction manager-->
+        <!--<feature>xaflow-1.0</feature>-->
+	      <feature>ssl-1.0</feature>
+        <!--demo app features-->
+        <feature>jaxrs-2.1</feature>
+        <feature>jdbc-4.3</feature>  
+        <!--test IBM MQ in OL, disable wasJmsClient and wasJmsServer and use jms-2.0-->
+        <feature>jms-2.0</feature>
+        <feature>monitor-1.0</feature>
+	<feature>mpHealth-1.0</feature>
+    </featureManager>
+  
+  <transaction
+    transactionLogDirectory="/shared-tranlogs/${env.HOSTNAME}"
+    recoveryGroup="svt-peer-recovery-group"
+    recoveryIdentity="${HOSTNAME}"
+    leaseLength="20"
+  /> 
+
+<!--save Liberty log and trace in non-default location in case pods are down-->
+    <!--logDirectory="/shared-tranlogs/liberty-logs/${env.HOSTNAME}"-->
+  <!-- 
+    <logging
+    traceSpecification="${env.traceString}"
+    maxFileSize="2000"
+    maxFiles="20"
+    traceFormat="BASIC"
+  />
+  -->
+<!-- allow reuse of 'busy' ports for fast server recycling on linux (where ports remain blocked for up to 2 mins after server stops) ${tradelite.http.port} set in bootstrap.properties --> 
+<httpEndpoint id="defaultHttpEndpoint" host="*" httpPort="${env.httpPort}" httpsPort="${env.httpsPort}"> 
+  <tcpOptions soReuseAddr="true" waitToAccept="true" acceptThread="true"/>
+	<httpOptions maxKeepAliveRequests="-1" />
+</httpEndpoint>
+
+<!--<keyStore id="defaultKeyStore" password="passw0rd"/> -->
+
+<!--DayTrader7xa app-->
+<application type="ear" id="daytrader7" name="daytrader7" location="daytrader-ee7-xa.ear"/>
+
+<applicationMonitor dropinsEnabled="true" updateTrigger="mbean"/> 
+<config updateTrigger="enabled"/>
+
+<connectionManager id="db2ConMgr1" agedTimeout="-1" connectionTimeout="5s" maxIdleTime="-1" maxPoolSize="100" minPoolSize="100" purgePolicy="FailingConnectionOnly" reapTime="-1"/>
+
+<jdbcDriver id="DB2JCC" libraryRef="DB2JCCLib"/> 
+<library id="DB2JCCLib" filesetRef="DB2JCCFileset"/>
+<fileset id="DB2JCCFileset" dir="/config/db2jars" includes="db2jcc4.jar, db2jcc_license_cu.jar"/>
+
+<!-- password specified when starting MQ docker container (e.g. MQ_APP_PASSWORD=passw0rd)-->
+<authData id="TradeAdminAuthData" user="app" password="passw0rd" />
+
+<dataSource jndiName="jdbc/TradeDataSource" id="DefaultDataSource" jdbcDriverRef="DB2JCC" connectionManagerRef="db2ConMgr1" statementCacheSize="60" isolationLevel="TRANSACTION_READ_COMMITTED" type="javax.sql.XADataSource">
+  <properties serverName="${env.DBHost}" portNumber="${env.DBPort}" databaseName="${env.DBName}" driverType="4" user="${env.DBUser}" password="${env.DBPasswd}"/> 
+</dataSource>
+
+<resourceAdapter id="mqJmsRa" location="${server.config.dir}/wmq.jmsra.rar" />
+
+<connectionManager id="mqConMgr1" connectionTimeout="60s" maxPoolSize="20"/>
+<connectionManager id="mqConMgr2" connectionTimeout="60s" maxPoolSize="20"/>
+
+<jmsQueueConnectionFactory jndiName="jms/TradeBrokerQCF" connectionManagerRef="mqConMgr1">
+  <properties.mqJmsRa
+      channel="DEV.APP.SVRCONN"
+      hostName="${env.mqHost}"
+      port="1414"
+      queueManager="${env.QueueManager}" 
+      transportType="CLIENT" 
+      userName="app"
+      password="passw0rd"/>
+</jmsQueueConnectionFactory>
+
+<jmsQueue id="TradeBrokerQueue" jndiName="jms/TradeBrokerQueue">
+  <properties.mqJmsRa baseQueueName="TradeBrokerQueue"  />
+</jmsQueue>
+
+<jmsTopicConnectionFactory jndiName="jms/TradeStreamerTCF" connectionManagerRef="mqConMgr2">
+   <properties.mqJmsRa 
+      transportType="CLIENT"
+      hostName="${env.mqHost}"
+      port="1414"
+      channel="DEV.APP.SVRCONN"
+      queueManager="${env.QueueManager}" 
+      userName="app"
+      password="passw0rd"/>
+</jmsTopicConnectionFactory>
+
+<jmsTopic id="TradeStreamerTopic" jndiName="jms/TradeStreamerTopic">
+   <properties.mqJmsRa baseTopicName="TradeStreamerTopic" />
+</jmsTopic>
+
+<jmsActivationSpec id="eis/TradeBrokerMDB" authDataRef="TradeAdminAuthData">
+     <properties.mqJmsRa 
+            transportType="CLIENT"
+            hostName="${env.mqHost}"
+            port="1414"
+            channel="DEV.APP.SVRCONN"
+            queueManager="${env.QueueManager}"
+            destinationRef="TradeBrokerQueue"
+            destinationType="javax.jms.Queue"/>
+</jmsActivationSpec>
+
+<jmsActivationSpec id="eis/TradeStreamerMDB" authDataRef="TradeAdminAuthData">
+      <properties.mqJmsRa 
+            transportType="CLIENT"
+            hostName="${env.mqHost}"
+            port="1414"
+            channel="DEV.APP.SVRCONN"
+            queueManager="${env.QueueManager}"
+            destinationRef="TradeStreamerTopic"
+            destinationType="javax.jms.Topic"/>
+</jmsActivationSpec>
+
+</server>

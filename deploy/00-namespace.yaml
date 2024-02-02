@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: db2
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  finalizers:
+  - kubernetes
+#---
+#apiVersion: v1
+#kind: Namespace
+#metadata:
+#  name: oldt7-gitops
+#  annotations:
+#    argocd.argoproj.io/sync-wave: "0"
+#spec:
+#  finalizers:
+#  - kubernetes
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mq
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  finalizers:
+  - kubernetes
+#---
+#apiVersion: v1
+#kind: Namespace
+#metadata:
+#  name: jmeter-oldt7
+#  annotations:
+#    argocd.argoproj.io/sync-wave: "0"
+#spec:
+#  finalizers:
+#  - kubernetes
+

@@ -1,0 +1,4 @@
+dependencies:
+  - name: ibm-db2oltp-dev
+    version: 1.0.0
+    repository: https://raw.githubusercontent.com/IBM/charts/master/repo/stable/

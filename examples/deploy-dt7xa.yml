@@ -1,0 +1,113 @@
+apiVersion: apps.openliberty.io/v1beta2
+kind: OpenLibertyApplication
+metadata:
+  name: dtee7-xa
+  namespace: svt-daytrader
+  #annotations for day2-operation
+  annotations:
+    openliberty.io/day2operations: OpenLibertyTrace,OpenLibertyDump
+    day2operation.openliberty.io/targetKinds: Pod
+spec:
+  replicas: 1
+  applicationImage: 'docker-na-public.artifactory.swg-devops.com/hyc-wassvt-team-image-registry-docker-local/svtapps/dt7xa-ol21009'
+  #configure route TLS termination policy (edge, reencrypt or passthrough) to test with https
+  route:
+    #host: ol-dt7xa-ol-dt7.apps.tam-ocp49.cp.fyre.ibm.com
+    path: /daytrader-xa
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  expose: true
+  #prereq Storage for serviceability for day2-operation
+  serviceability:
+    size: 2Gi
+    storageClassName: rook-cephfs
+  #deployment:
+  #  updateStrategy:
+  #    type: RollingUpdate  #RollingUpdate or Recreate, where RollingUpdate is the default
+  #deploy app as statefulsets
+  statefulSet:
+    updateStrategy:
+      type: RollingUpdate #RollingUpdate or OnDelete, where RollingUpdate is the default
+  service:
+    portName: liveness-port
+    targetPort: 9080
+    port: 9080
+    type: ClusterIP
+  #set up a startup probe, HTTP or TCP check, with a failureThreshold * periodSeconds long enough to cover the worse case startup time.
+  #Once the startup probe has succeeded once, the liveness probe takes over to provide a fast response to container deadlocks. 
+  #If the startup probe never succeeds, the container is killed after (failureThreshold*periodSeconds)seconds and subject to the pod's restartPolicy
+  startupProbe:
+    httpGet:
+      path: /health
+      port: liveness-port
+    failureThreshold: 10
+    periodSeconds: 10
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: liveness-port
+    failureThreshold: 1
+    periodSeconds: 10
+  readinessProbe:
+    httpGet:
+      path: /daytrader-xa
+      port: liveness-port
+    failureThreshold: 1
+    periodSeconds: 5
+  env:
+    - name: DBHost
+      value: '9.46.75.196' #hostname where DB2 container is running
+    - name: DBName
+      value: TRADEDB
+    - name: DBPort
+      value: "50000"  #DB2 container port
+    - name: DBUser
+      value: db2inst1
+    - name: DBPasswd
+      valueFrom:
+        secretKeyRef:
+          name: db-credential
+          key: dbpw
+    - name: QueueManager
+      value: QM1
+    - name: mqHost
+      value: '9.46.86.72' #hostname where MQ container is running
+    #- name: mqUser
+    #  value: app
+    #- name: mqPasswd
+    #  valueFrom:
+    #    secretKeyRef:
+    #      name: mq-cred
+    #      key: mqpw
+    - name: traceString
+      value: " "
+    - name: httpPort
+      value: "9080"
+    - name: httpsPort
+      value: "9443"
+  #Specify Always, Never, or IfNotPresent
+  pullPolicy: Always
+  #specify pull secret to allow pods to reference images from other secured registries such as artifactory
+  #see https://docs.openshift.com/container-platform/4.7/openshift_images/managing_images/using-image-pull-secrets.html#images-allow-pods-to-reference-images-from-secure-registries_using-image-pull-secrets
+  #pullSecret: "pull-secret-dt7xa"
+  volumes:
+    - name: shared-volume
+      persistentVolumeClaim:
+        claimName: dt-pvclaim
+  volumeMounts:
+    - name: shared-volume
+      mountPath: "/shared-tranlogs"
+  resourceConstraints:
+    limits:
+      cpu: 2000m
+      memory: 2048Mi
+    #requests:
+    #  cpu:
+    #  memory:
+  #autoscaling:
+  #  minReplicas: 1
+  #  maxReplicas: 5
+  #  targetCPUUtilizationPercentage: 80
+  #monitoring:
+  #  lables:
+  #  endpoints:

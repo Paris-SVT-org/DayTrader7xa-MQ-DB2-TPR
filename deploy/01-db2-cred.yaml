@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-credential
+  #namespace: oldt7-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+data:
+  dbpw: cGFzc3cwcmQ=
+type: Opaque

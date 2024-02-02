@@ -1,0 +1,146 @@
+###############################################################################
+# Licensed Materials - Property of IBM.
+# Copyright IBM Corporation 2017. All Rights Reserved.
+# U.S. Government Users Restricted Rights - Use, duplication or disclosure
+# restricted by GSA ADP Schedule Contract with IBM Corp.
+#
+# Contributors:
+#  IBM Corporation - initial API and implementation
+###############################################################################
+
+
+###############################################################################
+## Common image variables
+###############################################################################
+image:
+  repository: websphere-liberty
+  tag: latest
+  pullPolicy: IfNotPresent
+  license: ""
+
+service:
+  type: ClusterIP
+  name: sample-daytrader7
+  port: 9080
+  targetPort: 9080
+  
+
+###############################################################################
+## Persistence Storage
+###############################################################################
+
+## Persistence is disabled by default, set Enabled: true to use
+tranlog:
+  name: "tranlog"
+  persistence: 
+    enabled: false
+    existingClaimName: ""
+
+  ## Specify the name of the StorageClass
+  ## Setting StorageClass: "" will use whatever storageClass is currently
+  ## setup as the Default
+    storageClassName: "" 
+
+  ## tranlog requires a ReadWriteMany accessMode
+    accessMode: "ReadWriteOnce"
+
+  ## Tranlog requires a Persistence Storage volume size minimum of 1Gi
+    size: "1Gi"
+
+###############################################################################
+## Auto scaling
+###############################################################################
+replicaCount: 1
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 50
+  
+###############################################################################
+## Resource constraints
+###############################################################################
+resources:
+  constraints: 
+    enabled: false
+  requests:
+    cpu: 500m
+    memory: 512Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+ssl:
+  enabled: false
+  useClusterSSLConfiguration: false
+  createClusterSSLConfiguration: false
+
+ingress:
+  enabled: true
+  secureBackends: false
+  rewriteTarget: "/daytrader"
+  path: "/daytrader/"
+
+###############################################################################
+## MicroProfile
+###############################################################################
+microprofile:
+  health: 
+    enabled: false 
+
+  
+  
+
+ibm-db2oltp-dev:
+###############################################################################
+################################ IBM Db2 ######################################
+###############################################################################
+
+###############################################################################
+## Common image variables
+###############################################################################
+ibm-db2oltp-dev:
+  image:
+    repository: na.cumulusrepo.com/hcicp_dev/db2server_dec
+    tag: 11.1.2.2a
+    pullPolicy: IfNotPresent 
+    secret: "eyJuYS5jdW11bHVzcmVwby5jb20iOnsidXNlcm5hbWUiOiJ0b2tlbiIsInBhc3N3b3JkIjoiOTkxOTE5NGIwMDU3MDM0N2FmZTA1YmQzNjljN2Y3MmYiLCJlbWFpbCI6ImlkZWxpZGphQGNhLmlibS5jb20iLCJhdXRoIjoiZEc5clpXNDZPVGt4T1RFNU5HSXdNRFUzTURNME4yRm1aVEExWW1Rek5qbGpOMlkzTW1ZPSJ9fQ=="
+  service:
+    name: ibm-db2oltp-dev
+    type: ClusterIP
+    port: 50000
+  db2inst:
+    instname: ""
+    password: ""
+  options:
+    databaseName: "trade"
+    oracleCompatibility: "false"
+
+  ## global persistence settings
+  persistence:
+    enabled: true
+    useDynamicProvisioning: false
+
+  ## Persistence parameters for /database
+  dataVolume:
+    name: "data-stor"
+
+    ## Specify the name of the Existing Claim to be used by your application
+    ## empty string means don't use an existClaim
+    existingClaimName: ""
+
+    ## Specify the name of the StorageClass
+    ## empty string means don't use a StorageClass
+    storageClassName: ""
+    size: 5Gi
+
+  ## Configure resource requests and limits
+  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ##
+  resources:
+    requests:
+      memory: 2Gi
+      cpu: 2000m
+    limits:
+#      memory: 16Gi
+#      cpu: 4000m

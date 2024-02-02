@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jmeter-stress
+  #namespace: oldt7-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: "6"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jmeter-stress
+  template:
+    metadata:
+      labels:
+        app: jmeter-stress
+    spec:
+      initContainers:
+      - name: delay-jmeter
+        image: docker-na-public.artifactory.swg-devops.com/hyc-wassvt-team-image-registry-docker-local/jmeterstress/jmeter
+        imagePullPolicy: IfNotPresent
+        command: ['sh', '-c', 'echo Jmeter sleeping for 180s before starting stress run && sleep 180'] # sleep for 3 minutes 
+      containers:
+        - resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          name: jmeter-stress
+          env:
+           - name: KEEP_RUNNING_TO_GET_LOGS
+             value: 'true'
+           - name: JVM_ARGS
+             value: '-Dnashorn.args=--no-deprecation-warning'
+           - name: HOST
+             valueFrom:
+                configMapKeyRef:
+                  name: jmeter-route
+                  key: app-route
+          image: docker-na-public.artifactory.swg-devops.com/hyc-wassvt-team-image-registry-docker-local/jmeterstress/jmeter
+          imagePullPolicy: Always
+          args: [-script,
+                  Liberty/nest-dt7xa-ocp,
+                 -host,
+                  $(HOST),
+                 -port,
+                  '443',
+                 -protocol,
+                  https,
+                 -duration,
+                  '180', # seconds 1day=86400 3day=259200 5day=432000 7day=604800
+                 -threads,
+                  '5',
+                 -report,
+                  'true']

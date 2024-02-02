@@ -1,0 +1,109 @@
+apiVersion: apps.openliberty.io/v1beta2
+kind: OpenLibertyApplication
+metadata:
+  name: daytrader7xa
+  #annotations for day2-operation
+  annotations:
+    openliberty.io/day2operations: OpenLibertyTrace,OpenLibertyDump
+    day2operation.openliberty.io/targetKinds: Pod
+spec:
+  #replicas: 1
+  autoscaling:
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 80
+  #applicationImage: 'docker-na-public.artifactory.swg-devops.com/hyc-wassvt-team-image-registry-docker-local/daytrader/ol-daytrader7xa:java8'
+  applicationImage: 'docker-na-public.artifactory.swg-devops.com/hyc-wassvt-team-image-registry-docker-local/daytrader/ol-daytrader7xa:java11'
+  #applicationImage: 'docker-na-public.artifactory.swg-devops.com/hyc-wassvt-team-image-registry-docker-local/daytrader/ol-daytrader7xa:java17'
+  pullPolicy: Always  #Always, Never, or IfNotPresent
+  #pullSecret: "pull-secret-dt7xa"
+  route:
+    path: /daytrader-xa
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  expose: true
+  #storage for day2-operation
+  serviceability:
+    size: 2Gi
+    #storageClassName: rook-cephfs  #using default storageClass
+  statefulSet: {}
+    #updateStrategy:
+      #type: RollingUpdate
+  #deployment:
+    #specifies the strategy used to replace old Pods by new ones
+    #type can be RollingUpdate or Recreate (RollingUpdate is the default)
+    #updateStrategy:
+      #type: RollingUpdate
+  service:
+    portName: liveness-port
+    targetPort: 9080
+    port: 9080
+    type: ClusterIP
+  probes:
+    startup:
+      httpGet:
+        path: /health
+        port: liveness-port
+      failureThreshold: 10
+      periodSeconds: 10
+    liveness:
+      httpGet:
+        path: /health
+        port: liveness-port
+      failureThreshold: 5
+      periodSeconds: 10
+    readiness:
+      httpGet:
+        path: /daytrader-xa
+        port: liveness-port
+      failureThreshold: 5
+      periodSeconds: 10
+  env:
+    - name: DBHost
+      value: 'trade-db2.db2' #DB2 container service
+    - name: DBName
+      value: TRADEDB
+    - name: DBPort
+      value: "50000"  #running DB2 container port(the xxx number of mapping port -p xxx:yyy of the docker command)
+    - name: DBUser
+      value: db2inst1
+    - name: DBPasswd
+      valueFrom:
+        secretKeyRef:
+          name: db-credential
+          key: dbpw
+    - name: QueueManager
+      value: QM1
+    - name: mqHost
+      value: tam-ubuntu011.fyre.ibm.com  #use MQ container service later e.g. 'dt7xa.mq'
+    #- name: mqUser
+    #  value: app
+    #- name: mqPasswd
+    #  valueFrom:
+    #    secretKeyRef:
+    #      name: mq-cred
+    #      key: mqpw
+    - name: traceString
+      value: " "
+    - name: httpPort
+      value: "9080"
+    - name: httpsPort
+      value: "9443"
+  volumes:
+    - name: shared-volume
+      persistentVolumeClaim:
+        claimName: dt-pvclaim
+  volumeMounts:
+    - name: shared-volume
+      mountPath: "/shared-tranlogs"
+  resources:
+    requests:
+      cpu: 256m
+      memory: 512Mi
+    limits:
+      cpu: 512m
+      memory: 1024Mi
+  #monitoring:
+  #  lables:
+  #  endpoints:
+
