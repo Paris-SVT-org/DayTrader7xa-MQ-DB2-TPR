@@ -1,4 +1,4 @@
-# Deploying Daytrader7 Sample chart with Microservice Builder (test)
+# Deploying Daytrader7 Sample chart with Microservice Builder (test again)
 
 Daytrader7 requires two databases. daytrader-trade and daytrader-session. These databases should be deployed from the official db2-c helm chart, as per below. The Daytrader7 chart expects these specific names for service wiring, as seen in the deployment.yaml.
 
