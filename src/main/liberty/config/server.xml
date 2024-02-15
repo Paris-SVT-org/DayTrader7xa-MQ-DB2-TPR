@@ -69,7 +69,8 @@
   <properties serverName="${env.DBHost}" portNumber="${env.DBPort}" databaseName="${env.DBName}" driverType="4" user="${env.DBUser}" password="${env.DBPasswd}" sslConnection="${env.sslconn}"/> 
 </dataSource>
 
-<resourceAdapter id="mqJmsRa" location="${server.config.dir}/wmq.jmsra.rar" />
+<!--<resourceAdapter id="mqJmsRa" location="${server.config.dir}/wmq.jmsra.rar" /> -->
+<resourceAdapter id="mqJmsRa" location="/config/wmq.jmsra.rar" />
 
 <connectionManager id="mqConMgr1" connectionTimeout="60s" maxPoolSize="20"/>
 <connectionManager id="mqConMgr2" connectionTimeout="60s" maxPoolSize="20"/>
