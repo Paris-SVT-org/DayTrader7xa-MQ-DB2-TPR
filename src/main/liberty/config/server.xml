@@ -51,7 +51,7 @@
 
 <!--DayTrader7xa app-->
 <!--<application type="ear" id="daytrader7" name="daytrader7" location="${server.config.dir}/apps/daytrader-ee7-xa.ear"/> -->
-<application type="ear" id="daytrader7" name="daytrader7" location="daytraderbad-ee7-xa.ear"/>
+<application type="ear" id="daytrader7" name="daytrader7" location="daytrader-ee7-xa.ear"/>
 
 <applicationMonitor dropinsEnabled="true" updateTrigger="mbean"/> 
 <config updateTrigger="enabled"/>
