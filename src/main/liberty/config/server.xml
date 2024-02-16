@@ -24,12 +24,12 @@
 	<feature>mpHealth-1.0</feature>
     </featureManager>
   
-  <transaction
+  <!-- <transaction
     transactionLogDirectory="/shared-tranlogs/${env.HOSTNAME}"
     recoveryGroup="svt-peer-recovery-group"
     recoveryIdentity="${HOSTNAME}"
     leaseLength="20"
-  /> 
+  /> -->
 
 <!--save Liberty log and trace in non-default location in case pods are down-->
     <!--logDirectory="/shared-tranlogs/liberty-logs/${env.HOSTNAME}"-->
