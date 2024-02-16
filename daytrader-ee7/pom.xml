@@ -37,7 +37,7 @@
     </dependencies>
 
 	<build>
-        <finalName>daytrader-ee7-xa</finalName>
+        <finalName>daytrader7-ee7-xa</finalName>
         <plugins>
 	        <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
