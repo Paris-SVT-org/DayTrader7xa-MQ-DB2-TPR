@@ -60,7 +60,7 @@
 
 <jdbcDriver id="DB2JCC" libraryRef="DB2JCCLib"/> 
 <library id="DB2JCCLib" filesetRef="DB2JCCFileset"/>
-<fileset id="DB2JCCFileset" dir="/config/db2jars" includes="db2jcc4.jar, db2jcc_license_cu.jar"/>
+<fileset id="DB2JCCFileset" dir="/config/db2java" includes="db2jcc4.jar, db2jcc_license_cu.jar"/>
 
 <!-- password specified when starting MQ docker container (e.g. MQ_APP_PASSWORD=passw0rd)-->
 <authData id="TradeAdminAuthData" user="app" password="passw0rd" />
