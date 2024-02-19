@@ -77,13 +77,13 @@
 
 <jmsQueueConnectionFactory jndiName="jms/TradeBrokerQCF" connectionManagerRef="mqConMgr1">
   <properties.mqJmsRa
-      channel="CLOUD.APP.SVRCONN"
+      channel="DEV.APP.SVRCONN"
       hostName="${env.mqHost}"
-      port="30454"
+      port="1414"
       queueManager="${env.QueueManager}" 
       transportType="CLIENT" 
-      userName="coney"
-      password="{aes}ABMMSbyFVJp8+7C7OrpigKShC/bYhccxaMNQMx2M3S2j/6OuXp5fBFRBSpFwAa49IBH3aeFIXAeBoIoRfKq6Z1yLJeGoArqvv5udWjPvsbAd"/>
+      userName="app"
+      password="{aes}AEliOFNT1w6pORbfwd4zQKUEWQxl9KxweHtancso4HDo"/>
 </jmsQueueConnectionFactory>
 
 <jmsQueue id="TradeBrokerQueue" jndiName="jms/TradeBrokerQueue">
@@ -94,11 +94,11 @@
    <properties.mqJmsRa 
       transportType="CLIENT"
       hostName="${env.mqHost}"
-      port="30454"
-      channel="CLOUD.APP.SVRCONN"
+      port="1414"
+      channel="DEV.APP.SVRCONN"
       queueManager="${env.QueueManager}" 
-      userName="coney"
-      password="{aes}ABMMSbyFVJp8+7C7OrpigKShC/bYhccxaMNQMx2M3S2j/6OuXp5fBFRBSpFwAa49IBH3aeFIXAeBoIoRfKq6Z1yLJeGoArqvv5udWjPvsbAd"/>
+      userName="app"
+      password="{aes}AEliOFNT1w6pORbfwd4zQKUEWQxl9KxweHtancso4HDo"/>
 </jmsTopicConnectionFactory>
 
 <jmsTopic id="TradeStreamerTopic" jndiName="jms/TradeStreamerTopic">
@@ -109,8 +109,8 @@
      <properties.mqJmsRa 
             transportType="CLIENT"
             hostName="${env.mqHost}"
-            port="30454"
-            channel="CLOUD.APP.SVRCONN"
+            port="1414"
+            channel="DEV.APP.SVRCONN"
             queueManager="${env.QueueManager}"
             destinationRef="TradeBrokerQueue"
             destinationType="javax.jms.Queue"/>
@@ -120,8 +120,8 @@
       <properties.mqJmsRa 
             transportType="CLIENT"
             hostName="${env.mqHost}"
-            port="30454"
-            channel="CLOUD.APP.SVRCONN"
+            port="1414"
+            channel="DEV.APP.SVRCONN"
             queueManager="${env.QueueManager}"
             destinationRef="TradeStreamerTopic"
             destinationType="javax.jms.Topic"/>
