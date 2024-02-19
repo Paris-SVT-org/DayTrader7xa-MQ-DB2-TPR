@@ -79,11 +79,11 @@
   <properties.mqJmsRa
       channel="DEV.APP.SVRCONN"
       hostName="${env.mqHost}"
-      port="1414"
+      port="30454"
       queueManager="${env.QueueManager}" 
       transportType="CLIENT" 
-      userName="app"
-      password="passw0rd"/>
+      userName="coney"
+      password="{aes}ABMMSbyFVJp8+7C7OrpigKShC/bYhccxaMNQMx2M3S2j/6OuXp5fBFRBSpFwAa49IBH3aeFIXAeBoIoRfKq6Z1yLJeGoArqvv5udWjPvsbAd"/>
 </jmsQueueConnectionFactory>
 
 <jmsQueue id="TradeBrokerQueue" jndiName="jms/TradeBrokerQueue">
@@ -94,11 +94,11 @@
    <properties.mqJmsRa 
       transportType="CLIENT"
       hostName="${env.mqHost}"
-      port="1414"
+      port="30454"
       channel="DEV.APP.SVRCONN"
       queueManager="${env.QueueManager}" 
-      userName="app"
-      password="passw0rd"/>
+      userName="coney"
+      password="{aes}ABMMSbyFVJp8+7C7OrpigKShC/bYhccxaMNQMx2M3S2j/6OuXp5fBFRBSpFwAa49IBH3aeFIXAeBoIoRfKq6Z1yLJeGoArqvv5udWjPvsbAd"/>
 </jmsTopicConnectionFactory>
 
 <jmsTopic id="TradeStreamerTopic" jndiName="jms/TradeStreamerTopic">
@@ -109,7 +109,7 @@
      <properties.mqJmsRa 
             transportType="CLIENT"
             hostName="${env.mqHost}"
-            port="1414"
+            port="30454"
             channel="DEV.APP.SVRCONN"
             queueManager="${env.QueueManager}"
             destinationRef="TradeBrokerQueue"
@@ -120,7 +120,7 @@
       <properties.mqJmsRa 
             transportType="CLIENT"
             hostName="${env.mqHost}"
-            port="1414"
+            port="30454"
             channel="DEV.APP.SVRCONN"
             queueManager="${env.QueueManager}"
             destinationRef="TradeStreamerTopic"
