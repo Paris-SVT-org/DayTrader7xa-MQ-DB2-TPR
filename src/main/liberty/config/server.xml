@@ -77,7 +77,7 @@
 
 <jmsQueueConnectionFactory jndiName="jms/TradeBrokerQCF" connectionManagerRef="mqConMgr1">
   <properties.mqJmsRa
-      channel="DEV.APP.SVRCONN"
+      channel="CLOUD.APP.SVRCONN"
       hostName="${env.mqHost}"
       port="30454"
       queueManager="${env.QueueManager}" 
@@ -95,7 +95,7 @@
       transportType="CLIENT"
       hostName="${env.mqHost}"
       port="30454"
-      channel="DEV.APP.SVRCONN"
+      channel="CLOUD.APP.SVRCONN"
       queueManager="${env.QueueManager}" 
       userName="coney"
       password="{aes}ABMMSbyFVJp8+7C7OrpigKShC/bYhccxaMNQMx2M3S2j/6OuXp5fBFRBSpFwAa49IBH3aeFIXAeBoIoRfKq6Z1yLJeGoArqvv5udWjPvsbAd"/>
@@ -110,7 +110,7 @@
             transportType="CLIENT"
             hostName="${env.mqHost}"
             port="30454"
-            channel="DEV.APP.SVRCONN"
+            channel="CLOUD.APP.SVRCONN"
             queueManager="${env.QueueManager}"
             destinationRef="TradeBrokerQueue"
             destinationType="javax.jms.Queue"/>
@@ -121,7 +121,7 @@
             transportType="CLIENT"
             hostName="${env.mqHost}"
             port="30454"
-            channel="DEV.APP.SVRCONN"
+            channel="CLOUD.APP.SVRCONN"
             queueManager="${env.QueueManager}"
             destinationRef="TradeStreamerTopic"
             destinationType="javax.jms.Topic"/>
