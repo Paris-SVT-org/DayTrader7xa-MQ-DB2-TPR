@@ -63,7 +63,7 @@
 <fileset id="DB2JCCFileset" dir="/config/db2java" includes="db2jcc4.jar, db2jcc_license_cu.jar"/>
 
 <!-- password specified when starting MQ docker container (e.g. MQ_APP_PASSWORD=passw0rd)-->
-<authData id="TradeAdminAuthData" user="${env.mqUser}" password="${env.mqPassword}" />
+<authData id="TradeAdminAuthData" user="app" password="{aes}AEliOFNT1w6pORbfwd4zQKUEWQxl9KxweHtancso4HDo" />
 
 <dataSource jndiName="jdbc/TradeDataSource" id="DefaultDataSource" jdbcDriverRef="DB2JCC" connectionManagerRef="db2ConMgr1" statementCacheSize="60" isolationLevel="TRANSACTION_READ_COMMITTED" type="javax.sql.XADataSource">
   <properties serverName="${env.DBHost}" portNumber="${env.DBPort}" databaseName="${env.DBName}" driverType="4" user="${env.DBUser}" password="${env.DBPasswd}" sslConnection="${env.sslconn}"/> 
@@ -77,13 +77,13 @@
 
 <jmsQueueConnectionFactory jndiName="jms/TradeBrokerQCF" connectionManagerRef="mqConMgr1">
   <properties.mqJmsRa
-      channel="${env.mqChannel}"
+      channel="DEV.APP.SVRCONN"
       hostName="${env.mqHost}"
-      port="${env.mqPort}"
+      port="1414"
       queueManager="${env.QueueManager}" 
       transportType="CLIENT" 
-      userName="${env.mqUser}"
-      password="${env.mqPassword}"/>
+      userName="app"
+      password="{aes}AEliOFNT1w6pORbfwd4zQKUEWQxl9KxweHtancso4HDo"/>
 </jmsQueueConnectionFactory>
 
 <jmsQueue id="TradeBrokerQueue" jndiName="jms/TradeBrokerQueue">
@@ -94,11 +94,11 @@
    <properties.mqJmsRa 
       transportType="CLIENT"
       hostName="${env.mqHost}"
-      port="${env.mqPort}"
-      channel="${env.mqChannel}"
+      port="1414"
+      channel="DEV.APP.SVRCONN"
       queueManager="${env.QueueManager}" 
-      userName="${env.mqUser}"
-      password="${env.mqPassword}"/>
+      userName="app"
+      password="{aes}AEliOFNT1w6pORbfwd4zQKUEWQxl9KxweHtancso4HDo"/>
 </jmsTopicConnectionFactory>
 
 <jmsTopic id="TradeStreamerTopic" jndiName="jms/TradeStreamerTopic">
@@ -109,8 +109,8 @@
      <properties.mqJmsRa 
             transportType="CLIENT"
             hostName="${env.mqHost}"
-            port="${env.mqPort}"
-            channel="${env.mqChannel}"
+            port="1414"
+            channel="DEV.APP.SVRCONN"
             queueManager="${env.QueueManager}"
             destinationRef="TradeBrokerQueue"
             destinationType="javax.jms.Queue"/>
@@ -120,8 +120,8 @@
       <properties.mqJmsRa 
             transportType="CLIENT"
             hostName="${env.mqHost}"
-            port="${env.mqPort}"
-            channel="${env.mqChannel}"
+            port="1414"
+            channel="DEV.APP.SVRCONN"
             queueManager="${env.QueueManager}"
             destinationRef="TradeStreamerTopic"
             destinationType="javax.jms.Topic"/>
