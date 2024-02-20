@@ -25,8 +25,7 @@
     </featureManager>
   
   <transaction
-    transactionLogDirectory="/logs/shared-translog/bfj${wlp.server.name}"
-    recoverOnStartup="true"
+    transactionLogDirectory="/shared-translog/bfj${wlp.server.name}"
     recoveryGroup="svt-peer-recovery-group"
     recoveryIdentity="bfj${wlp.server.name}"
     leaseLength="20"
