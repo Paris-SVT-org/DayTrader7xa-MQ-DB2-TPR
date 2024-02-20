@@ -25,7 +25,7 @@
     </featureManager>
   
   <transaction
-    transactionLogDirectory="/shared-translog/${env.HOSTNAME}"
+    transactionLogDirectory="/logs/shared-translog/${env.HOSTNAME}"
     recoveryGroup="svt-peer-recovery-group"
     recoveryIdentity="${HOSTNAME}"
     leaseLength="20"
