@@ -65,6 +65,10 @@
 <!-- password specified when starting MQ docker container (e.g. MQ_APP_PASSWORD=passw0rd)-->
 <authData id="TradeAdminAuthData" user="${env.mqUser}" password="${env.mqPassword}" />
 
+<!-- Adding TradeDataSourceAuthData due to issue when trying to rebuild tables for DT user interface-->
+<authData id="TradeDataSourceAuthData" user="${env.DBUser}" password="${env.DBPasswd}" />
+
+
 <dataSource jndiName="jdbc/TradeDataSource" id="DefaultDataSource" jdbcDriverRef="DB2JCC" connectionManagerRef="db2ConMgr1" statementCacheSize="60" isolationLevel="TRANSACTION_READ_COMMITTED" type="javax.sql.XADataSource">
   <properties serverName="${env.DBHost}" portNumber="${env.DBPort}" databaseName="${env.DBName}" driverType="4" user="${env.DBUser}" password="${env.DBPasswd}" sslConnection="${env.sslconn}"/> 
 </dataSource>
@@ -82,6 +86,7 @@
       port="${env.mqPort}"
       queueManager="${env.QueueManager}" 
       transportType="CLIENT" 
+      sslCipherSuite="SSL_RSA_WITH_RC4_128_SHA"
       userName="${env.mqUser}"
       password="${env.mqPassword}"/>
 </jmsQueueConnectionFactory>
@@ -93,6 +98,7 @@
 <jmsTopicConnectionFactory jndiName="jms/TradeStreamerTCF" connectionManagerRef="mqConMgr2">
    <properties.mqJmsRa 
       transportType="CLIENT"
+      sslCipherSuite="SSL_RSA_WITH_RC4_128_SHA"
       hostName="${env.mqHost}"
       port="${env.mqPort}"
       channel="${env.mqChannel}"
