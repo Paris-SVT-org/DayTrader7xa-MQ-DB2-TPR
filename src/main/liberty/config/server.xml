@@ -86,6 +86,7 @@
       port="${env.mqPort}"
       queueManager="${env.QueueManager}" 
       transportType="CLIENT" 
+      sslCipherSuite="TLS12ORHIGHER"
       userName="${env.mqUser}"
       password="${env.mqPassword}"/>
 </jmsQueueConnectionFactory>
@@ -97,6 +98,7 @@
 <jmsTopicConnectionFactory jndiName="jms/TradeStreamerTCF" connectionManagerRef="mqConMgr2">
    <properties.mqJmsRa 
       transportType="CLIENT"
+      sslCipherSuite="TLS12ORHIGHER"
       hostName="${env.mqHost}"
       port="${env.mqPort}"
       channel="${env.mqChannel}"
