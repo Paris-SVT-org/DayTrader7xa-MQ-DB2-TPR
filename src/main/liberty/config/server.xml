@@ -86,7 +86,7 @@
       port="${env.mqPort}"
       queueManager="${env.QueueManager}" 
       transportType="CLIENT" 
-      sslCipherSuite="SSL_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
+      sslCipherSuite="SSL_RSA_WITH_RC4_128_SHA"
       userName="${env.mqUser}"
       password="${env.mqPassword}"/>
 </jmsQueueConnectionFactory>
@@ -98,7 +98,7 @@
 <jmsTopicConnectionFactory jndiName="jms/TradeStreamerTCF" connectionManagerRef="mqConMgr2">
    <properties.mqJmsRa 
       transportType="CLIENT"
-      sslCipherSuite="SSL_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
+      sslCipherSuite="SSL_RSA_WITH_RC4_128_SHA"
       hostName="${env.mqHost}"
       port="${env.mqPort}"
       channel="${env.mqChannel}"
@@ -114,7 +114,6 @@
 <jmsActivationSpec id="eis/TradeBrokerMDB" authDataRef="TradeAdminAuthData">
      <properties.mqJmsRa 
             transportType="CLIENT"
-            sslCipherSuite="SSL_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
             hostName="${env.mqHost}"
             port="${env.mqPort}"
             channel="${env.mqChannel}"
@@ -126,7 +125,6 @@
 <jmsActivationSpec id="eis/TradeStreamerMDB" authDataRef="TradeAdminAuthData">
       <properties.mqJmsRa 
             transportType="CLIENT"
-            sslCipherSuite="SSL_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
             hostName="${env.mqHost}"
             port="${env.mqPort}"
             channel="${env.mqChannel}"
