@@ -75,6 +75,11 @@
                 <artifactId>struts2-core</artifactId>
                 <version>2.5.33</version>
             </dependency>
+			<dependency>
+			    <groupId>org.apache.logging.log4j</groupId>
+			    <artifactId>log4j-core</artifactId>
+			    <version>2.12.4</version>
+			</dependency>            
             	<dependency>
                 <groupId>org.apache.struts</groupId>
                 <artifactId>struts2-convention-plugin</artifactId>
@@ -149,6 +154,11 @@
                 <artifactId>struts2-convention-plugin</artifactId>
                  <scope>compile</scope>
             </dependency>
+			<dependency>
+			    <groupId>org.apache.logging.log4j</groupId>
+			    <artifactId>log4j-core</artifactId>
+                <scope>compile</scope>
+ 			</dependency>            
 			<dependency>
                 <groupId>taglibs</groupId>
                 <artifactId>standard</artifactId>
