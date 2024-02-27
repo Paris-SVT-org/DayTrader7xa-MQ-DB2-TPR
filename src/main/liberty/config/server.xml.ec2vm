@@ -24,12 +24,22 @@
 	<feature>mpHealth-1.0</feature>
     </featureManager>
   
-  <transaction
+  <!-- <transaction
     transactionLogDirectory="/logs/shared-translog/${env.HOSTNAME}"
     recoveryGroup="svt-peer-recovery-group"
     recoveryIdentity="${HOSTNAME}"
     leaseLength="20"
-  />
+  /> -->
+
+  <transaction transactionLogDBTableSuffix="${HOSTNAME}${wlp.server.name}"
+        recoverOnStartup="false"
+        recoveryGroup="svt-peer-recovery-group"
+        recoveryIdentity="${HOSTNAME}${wlp.server.name}">
+        <dataSource transactional="false">
+        <jdbcDriver libraryRef="DB2JCCLib"/>
+          <properties databaseName="bludb" user="rsb74961" password="{aes}AEykdS7tRQEo1TVjmBkqwHlY3qSHJfBtuDfBJNg4MwEkTX9L3e7TPGaEvu1id6doKg==" serverName="b1bc1829-6f45-4cd4-bef4-10cf081900bf.c1ogj3sd0tgtu0lqde00.databases.appdomain.cloud" portNumber="32304" driverType="4" sslConnection="true"/>
+        </dataSource>
+  </transaction>
 
 <!--save Liberty log and trace in non-default location in case pods are down-->
     <!--logDirectory="/shared-tranlogs/liberty-logs/${env.HOSTNAME}"-->
@@ -63,7 +73,11 @@
 <fileset id="DB2JCCFileset" dir="/config/db2java" includes="db2jcc4.jar, db2jcc_license_cu.jar"/>
 
 <!-- password specified when starting MQ docker container (e.g. MQ_APP_PASSWORD=passw0rd)-->
-<authData id="TradeAdminAuthData" user="app" password="{aes}AEliOFNT1w6pORbfwd4zQKUEWQxl9KxweHtancso4HDo" />
+<authData id="TradeAdminAuthData" user="${env.mqUser}" password="${env.mqPassword}" />
+
+<!-- Adding TradeDataSourceAuthData due to issue when trying to rebuild tables for DT user interface-->
+<authData id="TradeDataSourceAuthData" user="${env.DBUser}" password="${env.DBPasswd}" />
+
 
 <dataSource jndiName="jdbc/TradeDataSource" id="DefaultDataSource" jdbcDriverRef="DB2JCC" connectionManagerRef="db2ConMgr1" statementCacheSize="60" isolationLevel="TRANSACTION_READ_COMMITTED" type="javax.sql.XADataSource">
   <properties serverName="${env.DBHost}" portNumber="${env.DBPort}" databaseName="${env.DBName}" driverType="4" user="${env.DBUser}" password="${env.DBPasswd}" sslConnection="${env.sslconn}"/> 
@@ -77,13 +91,13 @@
 
 <jmsQueueConnectionFactory jndiName="jms/TradeBrokerQCF" connectionManagerRef="mqConMgr1">
   <properties.mqJmsRa
-      channel="DEV.APP.SVRCONN"
+      channel="${env.mqChannel}"
       hostName="${env.mqHost}"
-      port="1414"
+      port="${env.mqPort}"
       queueManager="${env.QueueManager}" 
       transportType="CLIENT" 
-      userName="app"
-      password="{aes}AEliOFNT1w6pORbfwd4zQKUEWQxl9KxweHtancso4HDo"/>
+      userName="${env.mqUser}"
+      password="${env.mqPassword}"/>
 </jmsQueueConnectionFactory>
 
 <jmsQueue id="TradeBrokerQueue" jndiName="jms/TradeBrokerQueue">
@@ -94,11 +108,11 @@
    <properties.mqJmsRa 
       transportType="CLIENT"
       hostName="${env.mqHost}"
-      port="1414"
-      channel="DEV.APP.SVRCONN"
+      port="${env.mqPort}"
+      channel="${env.mqChannel}"
       queueManager="${env.QueueManager}" 
-      userName="app"
-      password="{aes}AEliOFNT1w6pORbfwd4zQKUEWQxl9KxweHtancso4HDo"/>
+      userName="${env.mqUser}"
+      password="${env.mqPassword}"/>
 </jmsTopicConnectionFactory>
 
 <jmsTopic id="TradeStreamerTopic" jndiName="jms/TradeStreamerTopic">
@@ -109,8 +123,8 @@
      <properties.mqJmsRa 
             transportType="CLIENT"
             hostName="${env.mqHost}"
-            port="1414"
-            channel="DEV.APP.SVRCONN"
+            port="${env.mqPort}"
+            channel="${env.mqChannel}"
             queueManager="${env.QueueManager}"
             destinationRef="TradeBrokerQueue"
             destinationType="javax.jms.Queue"/>
@@ -120,8 +134,8 @@
       <properties.mqJmsRa 
             transportType="CLIENT"
             hostName="${env.mqHost}"
-            port="1414"
-            channel="DEV.APP.SVRCONN"
+            port="${env.mqPort}"
+            channel="${env.mqChannel}"
             queueManager="${env.QueueManager}"
             destinationRef="TradeStreamerTopic"
             destinationType="javax.jms.Topic"/>
