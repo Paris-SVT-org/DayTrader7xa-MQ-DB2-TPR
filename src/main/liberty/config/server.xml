@@ -13,7 +13,7 @@
         <feature>jsonp-1.1</feature>
         <feature>beanValidation-2.0</feature>
         <!--user-defined xaflow-1.0 feature to test transaction manager-->
-        <!--<feature>xaflow-1.0</feature>-->
+        <feature>xaflow-1.0</feature>
 	      <feature>ssl-1.0</feature>
         <!--demo app features-->
         <feature>jaxrs-2.1</feature>
