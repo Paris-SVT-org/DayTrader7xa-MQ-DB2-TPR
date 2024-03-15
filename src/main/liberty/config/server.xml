@@ -34,14 +34,14 @@
   <transaction transactionLogDBTableSuffix="${HOSTNAME}${wlp.server.name}"
         recoverOnStartup="false"
         recoveryGroup="svt-peer-recovery-group"
-        recoveryIdentity="${HOSTNAME}${wlp.server.name}" leaseCheckInterval="20s" leaseLengh="10s">
+        recoveryIdentity="${HOSTNAME}${wlp.server.name}">
         <dataSource transactional="false">
         <jdbcDriver libraryRef="DB2JCCLib"/>
           <properties databaseName="bludb" user="rsb74961" password="{aes}AEykdS7tRQEo1TVjmBkqwHlY3qSHJfBtuDfBJNg4MwEkTX9L3e7TPGaEvu1id6doKg==" serverName="b1bc1829-6f45-4cd4-bef4-10cf081900bf.c1ogj3sd0tgtu0lqde00.databases.appdomain.cloud" portNumber="32304" driverType="4" sslConnection="true"/>
         </dataSource>
-  </transaction> 
+  </transaction>
 
-<!--save Liberty log and trace in non-default location in case pods are down-->
+  <!--save Liberty log and trace in non-default location in case pods are down-->
     <!--logDirectory="/shared-tranlogs/liberty-logs/${env.HOSTNAME}"-->
   <!-- 
     <logging
@@ -96,6 +96,7 @@
       port="${env.mqPort}"
       queueManager="${env.QueueManager}" 
       transportType="CLIENT" 
+      sslCipherSuite="SSL_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
       userName="${env.mqUser}"
       password="${env.mqPassword}"/>
 </jmsQueueConnectionFactory>
@@ -107,6 +108,7 @@
 <jmsTopicConnectionFactory jndiName="jms/TradeStreamerTCF" connectionManagerRef="mqConMgr2">
    <properties.mqJmsRa 
       transportType="CLIENT"
+      sslCipherSuite="SSL_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
       hostName="${env.mqHost}"
       port="${env.mqPort}"
       channel="${env.mqChannel}"
@@ -122,6 +124,7 @@
 <jmsActivationSpec id="eis/TradeBrokerMDB" authDataRef="TradeAdminAuthData">
      <properties.mqJmsRa 
             transportType="CLIENT"
+            sslCipherSuite="SSL_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
             hostName="${env.mqHost}"
             port="${env.mqPort}"
             channel="${env.mqChannel}"
@@ -133,6 +136,7 @@
 <jmsActivationSpec id="eis/TradeStreamerMDB" authDataRef="TradeAdminAuthData">
       <properties.mqJmsRa 
             transportType="CLIENT"
+            sslCipherSuite="SSL_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
             hostName="${env.mqHost}"
             port="${env.mqPort}"
             channel="${env.mqChannel}"
