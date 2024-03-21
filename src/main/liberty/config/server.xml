@@ -122,7 +122,7 @@
 <jmsActivationSpec id="eis/TradeBrokerMDB" authDataRef="TradeAdminAuthData">
      <properties.mqJmsRa 
             transportType="CLIENT"
-            sslCipherSuite="ECDHE_RSA_AES_128_GCM_SHA256"
+            sslCipherSuite="TLS_AES_128_GCM_SHA256"
             hostName="${env.mqHost}"
             port="${env.mqPort}"
             channel="${env.mqChannel}"
@@ -134,7 +134,7 @@
 <jmsActivationSpec id="eis/TradeStreamerMDB" authDataRef="TradeAdminAuthData">
       <properties.mqJmsRa 
             transportType="CLIENT"
-            sslCipherSuite="ECDHE_RSA_AES_128_GCM_SHA256"
+            sslCipherSuite="TLS_AES_128_GCM_SHA256"
             hostName="${env.mqHost}"
             port="${env.mqPort}"
             channel="${env.mqChannel}"
