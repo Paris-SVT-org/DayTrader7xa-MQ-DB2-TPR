@@ -1,2 +1,2 @@
--Dcom.ibm.msg.client.commonservices.trace.status=ON
--Dcom.ibm.msg.client.commonservices.trace.outputName=/logs/MQRA-WLP_%PID%.trc
+#-Dcom.ibm.msg.client.commonservices.trace.status=ON
+#-Dcom.ibm.msg.client.commonservices.trace.outputName=/logs/MQRA-WLP_%PID%.trc
